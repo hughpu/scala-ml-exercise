@@ -4,16 +4,20 @@ import breeze.linalg.{DenseMatrix, DenseVector}
 import github.hughpu.ml.model.{Estimator, Model}
 import github.hughpu.ml.utility.{Activation, Loss}
 
-class LogisticRegressor(iters: Int, shrinkage: Double) extends Estimator[Double] {
+class LogisticRegressor(iters: Int = 1000, shrinkage: Double = 1e-2) extends Estimator[Double] {
     var params: DenseVector[Double] = null
 
     def fit(x: DenseMatrix[Double], y: DenseVector[Double]): LogisticRegressionModel = {
+
+        require(x.rows == y.length, "[ERROR] The size of x and y should match!")
+
         val X = DenseMatrix.vertcat(x, DenseMatrix.fill(x.rows, 1){1.0})
-        params = DenseVector.rand(X.cols)
+        params = DenseVector.zeros(X.cols)
+
         for (i <- 0 to iters) {
             val grads = gradient(X, y)
-            params += grads * shrinkage
-            if (i % 20 == 0) {
+            params -= grads *:* shrinkage
+            if (i % 100 == 0) {
                 val lossVal = Loss.crossEntropy(X dot params, y)
                 println(s"[Info] Step: $i, CrossEntropy loss: $lossVal")
             }
@@ -22,7 +26,7 @@ class LogisticRegressor(iters: Int, shrinkage: Double) extends Estimator[Double]
     }
 
     def gradient(X: DenseMatrix[Double], y: DenseVector[Double]): DenseVector[Double] = {
-        (y - compute(X)) dot X /:/ X.rows
+        (compute(X) - y) dot X /:/ X.rows
     }
 
     def compute(X: DenseMatrix[Double]): DenseVector[Double] = {

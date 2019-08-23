@@ -5,6 +5,7 @@ import breeze.numerics.log
 
 object Loss {
     def crossEntropy(logit: DenseVector[Double], lable: DenseVector[Double]) = {
-        lable *:* log(Activation.sigmoid(logit))
+        val pred = Activation.sigmoid(logit)
+        - (lable *:* log(pred) + (1.0 - lable) *:* log(1 - pred))
     }
 }
