@@ -7,20 +7,20 @@ import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.util.Random
 
 object helper {
-    def readCsv(path: String, delimiter: Char = ','): DenseMatrix[Any] = {
+    def readCsv(path: String, delimiter: Char = ','): DenseMatrix[Double] = {
         val lines = fromFile(path).getLines
-        val listBuf = ListBuffer.empty[Array[Any]]
+        val listBuf = ListBuffer.empty[Array[Double]]
         for(l <- lines) {
-            val line = ArrayBuffer.empty[Any]
+            val line = ArrayBuffer.empty[Double]
             l.split(delimiter).foreach {
-                line += _
+                line += _.toDouble
             }
             listBuf += line.toArray
         }
         DenseMatrix(listBuf.toList:_*)
     }
 
-    def Spliter() = new Spliter
+    def spliter() = new Spliter
 
 
 }
