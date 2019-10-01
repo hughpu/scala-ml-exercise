@@ -3,7 +3,7 @@ package github.hughpu.ml.utility
 import breeze.linalg.DenseVector
 
 object Metric {
-    def roc[T <: Float with Int with Double](label: DenseVector[T], pred: DenseVector[T]): Float = {
+    def roc(label: DenseVector[Double], pred: DenseVector[Double]): Float = {
         val labelArr = label.toArray
         val predArr = label.toArray
 
