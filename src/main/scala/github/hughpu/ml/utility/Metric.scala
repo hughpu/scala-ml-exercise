@@ -27,4 +27,13 @@ object Metric {
         }
         roc.toFloat
     }
+
+    //def f1Score(label: DenseVector[Double], pred: DenseVector[Double]): Float
+    //
+    //def accuracy(label: DenseVector[Double], pred: DenseVector[Double]): Float
+    //
+    //def rSquare(label: DenseVector[Double], pred: DenseVector[Double]): Float
+    //
+    //def rmse(label: DenseVector[Double], pred: DenseVector[Double]): Float
+
 }
