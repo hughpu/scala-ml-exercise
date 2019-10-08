@@ -1,16 +1,28 @@
 package github.hughpu.ml.utility
 
+import java.io.InputStream
+
 import breeze.linalg.{DenseMatrix, DenseVector}
 
-import scala.io.Source._
+import scala.io.Source
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.util.Random
 
 object helper {
-    def readCsv(path: String, delimiter: Char = ','): Array[Array[Any]] = {
-        val fileSource = fromFile(path)
+    def readCsv(path: String, delimiter: Char = ',', skipHead: Boolean = true, deBug: Boolean = false): Array[Array[Any]] = {
+        val fileSource = {
+            if(!deBug) {
+                Source.fromFile(path)
+            } else {
+                val is: InputStream = getClass.getResourceAsStream(path)
+                Source.fromInputStream(is)
+            }
+        }
         val lines = fileSource.getLines
         val arrBuf = ArrayBuffer.empty[Array[Any]]
+        if(skipHead) {
+            lines.next
+        }
         for(l <- lines) {
             val line = ArrayBuffer.empty[Any]
             l.split(delimiter).foreach {

@@ -11,7 +11,7 @@ class LogisticRegressor(iters: Int = 1000, shrinkage: Double = 1e-2) extends Est
 
         require(x.rows == y.length, "[ERROR] The size of x and y should match!")
 
-        val X = DenseMatrix.vertcat(x, DenseMatrix.fill(x.rows, 1){1.0})
+        val X = DenseMatrix.horzcat(x, DenseMatrix.fill(x.rows, 1){1.0})
         params = DenseVector.zeros(X.cols)
 
         for (i <- 0 to iters) {
@@ -46,7 +46,7 @@ class LogisticRegressionModel(params: DenseVector[Double]) extends Model[Double]
     }
 
     def predict_proba(x: DenseMatrix[Double]): DenseVector[Double] = {
-        val X = DenseMatrix.vertcat(x, DenseMatrix.fill(x.rows, 1){1.0})
+        val X = DenseMatrix.horzcat(x, DenseMatrix.fill(x.rows, 1){1.0})
         Activation.sigmoid(X * params)
     }
 }

@@ -15,8 +15,11 @@
   </licenses>
 
   <properties>
-    <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <java.version>1.8</java.version>
+    <PermGen>512m</PermGen>
+    <MaxPermGen>1024m</MaxPermGen>
     <encoding>UTF-8</encoding>
     <scala.version>2.11.8</scala.version>
     <scala.compat.version>2.11</scala.compat.version>
@@ -30,7 +33,7 @@
     </dependency>
     <dependency>
       <groupId>org.scalanlp</groupId>
-      <artifactId>breeze_2.13</artifactId>
+      <artifactId>breeze_2.11</artifactId>
       <version>1.0</version>
     </dependency>
     <!-- Test -->
@@ -47,6 +50,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.scalactic</groupId>
+      <artifactId>scalactic_${scala.compat.version}</artifactId>
+      <version>3.0.8</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.scalatest</groupId>
       <artifactId>scalatest_${scala.compat.version}</artifactId>
       <version>3.0.8</version>
@@ -55,45 +64,64 @@
   </dependencies>
 
   <build>
-    <sourceDirectory>src/main/scala</sourceDirectory>
-    <testSourceDirectory>src/test/scala</testSourceDirectory>
+    <sourceDirectory>${basedir}/src/main/scala</sourceDirectory>
     <plugins>
-      <plugin>
-        <!-- see http://davidb.github.com/scala-maven-plugin -->
-        <groupId>net.alchim31.maven</groupId>
-        <artifactId>scala-maven-plugin</artifactId>
-        <version>3.2.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-              <goal>testCompile</goal>
-            </goals>
-            <configuration>
-              <args>
-                <arg>-make:transitive</arg>
-                <arg>-dependencyfile</arg>
-                <arg>${project.build.directory}/.scala_dependencies</arg>
-              </args>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.18.1</version>
-        <configuration>
-          <useFile>false</useFile>
-          <disableXmlReport>true</disableXmlReport>
-          <!-- If you have classpath issue like NoDefClassError,... -->
-          <!-- useManifestOnlyJar>false</useManifestOnlyJar -->
-          <includes>
-            <include>**/*Test.*</include>
-            <include>**/*Suite.*</include>
-          </includes>
-        </configuration>
-      </plugin>
+<!--      <plugin>-->
+<!--        <groupId>org.apache.maven.plugins</groupId>-->
+<!--        <artifactId>maven-shade-plugin</artifactId>-->
+<!--        <version>2.4.3</version>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <phase>package</phase>-->
+<!--            <goals>-->
+<!--              <goal>shade</goal>-->
+<!--            </goals>-->
+<!--            <configuration>-->
+<!--              <minimizeJar>false</minimizeJar>-->
+<!--              <shadedArtifactAttached>true</shadedArtifactAttached>-->
+<!--              <artifactSet>-->
+<!--                <includes>-->
+<!--                  &lt;!&ndash; Include here the dependencies you-->
+<!--                      want to be packed in your fat jar &ndash;&gt;-->
+<!--                  <include>org.jpmml:jpmml-converter</include>-->
+<!--                  <include>org.jpmml:pmml-model</include>-->
+<!--                  <include>org.jpmml:jpmml-sparkml</include>-->
+<!--                  <include>com.aliyun.oss:aliyun-sdk-oss</include>-->
+<!--                  <include>org.jdom:jdom</include>-->
+<!--                </includes>-->
+<!--              </artifactSet>-->
+<!--              <filters>-->
+<!--                <filter>-->
+<!--                  <artifact>*:*</artifact>-->
+<!--                  <excludes>-->
+<!--                    <exclude>META-INF/*.SF</exclude>-->
+<!--                    <exclude>META-INF/*.DSA</exclude>-->
+<!--                    <exclude>META-INF/*.RSA</exclude>-->
+<!--                  </excludes>-->
+<!--                </filter>-->
+<!--              </filters>-->
+<!--              <transformers>-->
+<!--                <transformer-->
+<!--                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">-->
+<!--                  <resource>reference.conf</resource>-->
+<!--                </transformer>-->
+<!--              </transformers>-->
+<!--            </configuration>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--      </plugin>-->
+
+<!--      <plugin>-->
+<!--        <groupId>org.apache.maven.plugins</groupId>-->
+<!--        <artifactId>maven-compiler-plugin</artifactId>-->
+<!--        <version>3.6.0</version>-->
+<!--        <configuration>-->
+<!--          <source>${java.version}</source>-->
+<!--          <target>${java.version}</target>-->
+<!--          <encoding>UTF-8</encoding>-->
+<!--        </configuration>-->
+<!--      </plugin>-->
+
       <plugin>
         <groupId>org.scalatest</groupId>
         <artifactId>scalatest-maven-plugin</artifactId>
@@ -101,7 +129,7 @@
         <configuration>
           <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
           <junitxml>.</junitxml>
-          <filereports>WDF TestSuite.txt</filereports>
+          <filereports>WDFTestSuite.txt</filereports>
         </configuration>
         <executions>
           <execution>
@@ -112,6 +140,67 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <skipTests>true</skipTests>
+          <debugForkedProcess>true</debugForkedProcess>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>scala-maven-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>scala-compile-first</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>scala-test-compile-first</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>attach-scaladocs</id>
+            <phase>site</phase>
+            <goals>
+              <goal>doc-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <scalaVersion>${scala.version}</scalaVersion>
+          <recompileMode>incremental</recompileMode>
+          <args>
+            <arg>-unchecked</arg>
+            <arg>-deprecation</arg>
+            <arg>-feature</arg>
+          </args>
+          <jvmArgs>
+            <jvmArg>-Xms64m</jvmArg>
+            <jvmArg>-Xmx1024m</jvmArg>
+            <jvmArg>-XX:PermSize=${PermGen}</jvmArg>
+            <jvmArg>-XX:MaxPermSize=${MaxPermGen}</jvmArg>
+          </jvmArgs>
+          <javacArgs>
+            <javacArg>-source</javacArg>
+            <javacArg>${java.version}</javacArg>
+            <javacArg>-target</javacArg>
+            <javacArg>${java.version}</javacArg>
+          </javacArgs>
+        </configuration>
+      </plugin>
     </plugins>
+    <testSourceDirectory>${basedir}/src/test/scala</testSourceDirectory>
   </build>
 </project>

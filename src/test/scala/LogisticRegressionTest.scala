@@ -1,18 +1,18 @@
 /*
 test if the performance of the model run well
 */
-import breeze.linalg.{DenseMatrix, DenseVector, convert}
+import breeze.linalg.{DenseMatrix, DenseVector}
 import github.hughpu.ml.classifier.LogisticRegressor
 import github.hughpu.ml.utility.{Metric, helper}
 import org.junit.runner.RunWith
 import org.scalatest._
 import org.scalatestplus.junit.JUnitRunner
 
-@RunWith(classOf[JUnitRunner])
-class LogisticRegressionTests extends FunSuite with Matchers {
+//@RunWith(classOf[JUnitRunner])
+class LogisticRegressionTest extends FunSuite with Matchers {
 
-  test("An empty list should be empty") {
-    val dataset = helper.readCsv("../dataset/IRIS.csv")
+  test("test_1") {
+    val dataset = helper.readCsv("/dataset/IRIS.csv", deBug = true)
     val xArr = dataset.map(_.slice(0, dataset(0).length - 1)).map(_.map(_.toString.toDouble))
     val yArr = dataset.map(_(dataset(0).length - 1)).map {
       case "Iris-setosa" => 1.0
@@ -30,5 +30,6 @@ class LogisticRegressionTests extends FunSuite with Matchers {
     println(s"Performance of the model IRIS dataset is auc: $performance")
 
     performance should be >= 0.6f
+    1 should be (1)
   }
 }
