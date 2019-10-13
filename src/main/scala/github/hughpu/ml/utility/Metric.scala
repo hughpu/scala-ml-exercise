@@ -1,6 +1,7 @@
 package github.hughpu.ml.utility
 
 import breeze.linalg.DenseVector
+import breeze.stats.mean
 
 object Metric {
     def roc(label: DenseVector[Double], pred: DenseVector[Double]): Float = {
@@ -32,8 +33,16 @@ object Metric {
     //
     //def accuracy(label: DenseVector[Double], pred: DenseVector[Double]): Float
     //
-    //def rSquare(label: DenseVector[Double], pred: DenseVector[Double]): Float
-    //
+
+    def rSquare(label: DenseVector[Double], pred: DenseVector[Double]): Double = {
+        val priorDiff = label - mean(label)
+        val priorVariation = priorDiff.t * priorDiff
+        val postDiff = label - pred
+        val postVariation = postDiff.t * postDiff
+
+        1.0 - postVariation / priorVariation
+    }
+
     //def rmse(label: DenseVector[Double], pred: DenseVector[Double]): Float
 
 }
